@@ -4,19 +4,8 @@ import re
 import random
 from math import *
 from contextlib import redirect_stdout
+from itertools import count
 
-
-class TextWrapper:
-    text_field: Text
-
-    def __init__(self, text_field: Text):
-        self.text_field = text_field
-
-    def write(self, text: str):
-        self.text_field.insert(END, text)
-
-    def flush(self):
-        self.text_field.update()
 
 
 def combinations(lst, k):
@@ -39,12 +28,23 @@ def finish():
     print("Закрытие приложения")
 
 def is_valid(newval):
-    result=  re.match("[3-9]\d*", newval) is not None
+    result=  re.match("[3-9]\d*$|^[1-9]\d+$", newval) is not None
     if not result :
         errmsg.set("Вы ввели что-то не то, следуйте указаниям .")
     else:
         errmsg.set("")
     return result
+class TextWrapper:
+    text_field: Text
+
+    def __init__(self, text_field: Text):
+        self.text_field = text_field
+
+    def write(self, text: str):
+        self.text_field.insert(END, text)
+
+    def flush(self):
+        self.text_field.update()
 
 def click_button():
     window = Tk()
@@ -52,21 +52,21 @@ def click_button():
     window.geometry("1000x500")
     text = Text(window)
     text.pack()
-
+    window.update_idletasks()
     z = en_1.get()  # Записываем введенный текст в переменную "а"
     print(z)
     n = 25
     pairs = []
-    s = 0  # индикатор заполнения
-    while s != z:
-        # генерируем два случайных числа и добавляем их в список в виде кортежа
-        x = random.randint(0, n)
-        y = random.randint(0, n)
-        # ограничение на характеристики объектов
-        if (x + y) % 3 == 0:
-            if not (x, y) in pairs:  # защита от одинаковых точек
-                pairs.append((x, y))
-                s += 1
+
+    for s in count(0, 1):
+        if s >= int(z):
+            break
+        else:
+            print(s)
+            # генерируем два случайных числа и добавляем их в список в виде кортежа
+            x = random.randint(0, n)
+            y = random.randint(0, n)
+            pairs.append((x, y))
     print(" \n Кординаты точек", pairs, file=TextWrapper(text))
 
     m = []
@@ -102,21 +102,16 @@ root.maxsize(1100,700)   # максимальные размеры: ширина
 
 
 
-Title = Label(text="Задание на л.р. №8:", font=("Times New Roman",14,"bold"))  # создаем текстовую метку
+Title = Label(text="Задание на л.р. №8:", font=("Times New Roman",16,"bold"))  # создаем текстовую метку
 Title.pack(anchor="n")  # размещаем метку в окне
 task = Label(text="Требуется для своего варианта второй\ части л.р. №6 (усложненной программы) или ее объектно-ориентированной"
-                  " \nреализации (л.р. №7) разработать реализацию с использованием графического интерфейса.\n"
-                  "\nЗадание на л.р. №6:\n"
-                  "Вариант 16. На плоскости задано К точек. Сформировать все возможные варианты выбора множества точек из них\n"
-                  "для формирования всех возможных треугольников. В усложненной программе необходимо чтобы сумма координат\n "
-                  "точки была кратна трём,"
-                  "затем рассчитать периметр треугольника по координатам,периметр самого большого \nтреугольника, вывести в консоль.",
-             font=("Times New Roman",12),anchor="e").pack()
+                  " \nреализации (л.р. №7) разработать реализацию с использованием графического интерфейса." ,
+             font=("Times New Roman",14),anchor="e").pack()
 
 
 
 #блок для ввода\вывода информации
-text1 = Label(text="\n\nВведите количество точек (число должно быть больше или равно 3)").pack()
+text1 = Label(text="\n\nВведите количество точек (число должно быть больше или равно 3)",font=("Times New Roman",14)).pack()
 
 
 check = (root.register(is_valid), "%P")
